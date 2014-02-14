@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<script>
+window.onload = function (){
+    (function () {
+     var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
+     window.requestAnimationFrame = requestAnimationFrame;
+     }());
+     
+     var canvas = document.getElementById('myCanvas');
+     var context = canvas.getContext('2d');
+     
+     createCircle(100, 150, '90', '675');
+     createCircle(300, 150, '89', '479');
+     createCircle(500, 150, '81', '715');
+     createCircle(700, 150, '82', '334');
+     
+     
+     function createCircle(x, y, temp, hash, callback) {
+         var radius = 75;
+         var endPercent = parseInt(temp, 10);
+         if(endPercent > 50)
+         endPercent = (50 + (endPercent - 50) * (58/100));
+         var curPerc = 0;
+         var counterClockwise = false;
+         var circ = Math.PI * 2;
+         var quart = Math.PI / 2;
+         
+         context.strokeStyle = '#006600';
+         context.ImageSmoothingEnabled=true;
+         context.lineWidth = 10;
+         context.lineCap = "round";
+         var offset = quart;
+         
+         function doText(context, x, y, temp, hash) {
+             if (parseInt(temp, 10) > 89) context.fillStyle = '#ad2323';
+             else if (parseInt(temp, 10) > 81) context.fillStyle = '#ffcc33';
+             else context.fillStyle = '#006600';
+             context.font = "26px sans-serif";
+             context.beginPath();
+             context.clearRect(x - 25, y - 30, 52, 52);
+             context.fillText(temp + '°', x - 20, y + 10);
+             context.fillText(hash + 'KH/s', x - 50, y - 100);
+             context.closePath();
+         }
+         
+         function animate(current) {
+             context.lineWidth = 15;
+             context.font = "26px sans-serif";
+             if (curPerc > (50 + (89 - 50) * (58/100))) context.strokeStyle = '#ad2323';
+             else if (curPerc > (50 + (80 - 50) * (58/100))) context.strokeStyle = '#ffcc33';
+             context.clearRect(x - radius - context.lineWidth,
+                               y - radius - context.lineWidth,
+                               radius * 2 + (context.lineWidth*2),
+                               radius * 2 + (context.lineWidth*2));
+                               context.beginPath();
+                               
+                               context.fillText(curPerc + '°', x - 20, y + 10);
+                               context.arc(x, y, radius, offset, ((circ) * current) + offset, false);
+                               context.stroke();
+                               context.closePath();
+                               curPerc++;
+                               if (curPerc < endPercent) {
+                                   requestAnimationFrame(function () {
+                                                         animate(curPerc / 100);
+                                                         });
+                               } else {
+                                   doText(context, x, y, temp, hash);
+                                   if (callback) callback.call();
+                               }
+         }
+         animate();
+     }
+}
+</script>
+<style>
+body {
+margin: 0px;
+padding: 0px;
+background: #f1ecec;
+}
+</style>
+</head>
+<body>
+<canvas id="myCanvas" width="800" height="350"></canvas>
+</body>
+</html>
